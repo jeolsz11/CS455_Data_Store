@@ -135,7 +135,7 @@ Show tabulated metrics of specific device by ID
 ```
 ----------------------------------------------------------------------------------------------------
 Good reference articles:
-[Use JSON in MariaDB](https://mariadb.com/resources/blog/using-json-in-mariadb/)
-[How to Connect Python to MariaDB](https://mariadb.com/resources/blog/how-to-connect-python-programs-to-mariadb/)
-[MariaDB Administration](https://www.tutorialspoint.com/mariadb/mariadb_administration.htm)
-[List of JSON functions](https://mariadb.com/kb/en/json-functions/)
+- [Use JSON in MariaDB](https://mariadb.com/resources/blog/using-json-in-mariadb/)
+- [How to Connect Python to MariaDB](https://mariadb.com/resources/blog/how-to-connect-python-programs-to-mariadb/)
+- [MariaDB Administration](https://www.tutorialspoint.com/mariadb/mariadb_administration.htm)
+- [List of JSON functions](https://mariadb.com/kb/en/json-functions/)
