@@ -2,13 +2,13 @@
 # PYTHON SCRIPT TO AUTOMIZE DATABASE
 
 # Module Imports
-import mariadb
+import MySQLdb
 import sys
 import json
 
 # Connect to MariaDB Platform
 try:
-	conn = mariadb.connect(
+	conn = MySQLdb.connect(
 	host="cs.csis.work",
 	port=22,
 	user="monstore",
