@@ -44,7 +44,7 @@ NOTES
 Table creation statements (copy & paste directly into shell)
 ```
 MariaDB [monstore]> CREATE TABLE devices (metrics JSON);
- MariaDB [monstore]> CREATE TABLE error_log (error JSON, date varchar(10));
+MariaDB [monstore]> CREATE TABLE error_log (error JSON, date varchar(10));
 ```
 View entire tables untabulated	
 ```
