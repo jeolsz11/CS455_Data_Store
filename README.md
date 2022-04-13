@@ -22,34 +22,34 @@ Server version: 10.4.24-MariaDB mariadb.org binary distribution
 ```
 Now either select database 
 ```
-MariaDB [(none)]> use monitor_metrics;
+MariaDB [(none)]> use monstore;
 ```
 or create one	
 ```
-MariaDB [(none)]> CREATE DATABASE monitor_metrics; 
-MariaDB [(none)]> use monitor_metrics;
+MariaDB [(none)]> CREATE DATABASE monstore; 
+MariaDB [(none)]> use monstore;
  ```
 	
 It should say "Database changed" to show you are in that database
 
 NOTES
 	delete database
-		MariaDB [(none)]> DELETE DATABASE monitor_metrics;
+		MariaDB [(none)]> DELETE DATABASE monstore;
 	show exsisitng databases 
 		MariaDB [(none)]> show databases;
 	to view all tables in database
-		MariaDB [monitor_metrics]> show tables;
+		MariaDB [monstore]> show tables;
 
 
 Table creation statements (copy & paste directly into shell)
 ```
-MariaDB [monitor_metrics]> CREATE TABLE devices (metrics JSON);
- MariaDB [monitor_metrics]> CREATE TABLE error_log (error JSON, date varchar(10));
+MariaDB [monstore]> CREATE TABLE devices (metrics JSON);
+ MariaDB [monstore]> CREATE TABLE error_log (error JSON, date varchar(10));
 ```
 View entire tables untabulated	
 ```
-MariaDB [monitor_metrics]> SELECT * FROM devices;
-MariaDB [monitor_metrics]> SELECT * FROM error_log;
+MariaDB [monstore]> SELECT * FROM devices;
+MariaDB [monstore]> SELECT * FROM error_log;
 ```
 	
 The Engine receives JSON formatted data and performs a sanity check on it
@@ -64,13 +64,13 @@ EXAMPLE JSON DATA SENT BY AGENTS
 
 Assuming tables are already created
 ```
-MariaDB [monitor_metrics]> INSERT INTO devices() VALUES('{ "ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea3", "Time Stamp": "22:03:29", "CPU": 8, "DISK": 44, "MEMORY": 31, "NETWORK": 8 }');	
-MariaDB [monitor_metrics]> INSERT INTO error_log() VALUES('{"Message": "meow", "Device": 45}','04.04.2022');
+MariaDB [monstore]> INSERT INTO devices() VALUES('{ "ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea3", "Time Stamp": "22:03:29", "CPU": 8, "DISK": 44, "MEMORY": 31, "NETWORK": 8 }');	
+MariaDB [monstore]> INSERT INTO error_log() VALUES('{"Message": "meow", "Device": 45}','04.04.2022');
 ```
 	
 Show metrics of all devices / AKA show entire table
 ```
-MariaDB [monitor_metrics]> SELECT * FROM devices;
+MariaDB [monstore]> SELECT * FROM devices;
 +-----------------------------------------------------+
 | metrics                                             |
 +-----------------------------------------------------+
@@ -81,7 +81,7 @@ MariaDB [monitor_metrics]> SELECT * FROM devices;
 |                 additonal rows here                 |
 +-----------------------------------------------------+
 
-MariaDB [monitor_metrics]> SELECT * FROM error_log
+MariaDB [monstore]> SELECT * FROM error_log
 +-----------------------------------+------------+
 | error                             |    date    |
 +-----------------------------------+------------+
@@ -93,7 +93,7 @@ MariaDB [monitor_metrics]> SELECT * FROM error_log
 
 Show metrics of specific device by ID
 ```
-	MariaDB [monitor_metrics]> SELECT * FROM devices WHERE JSON_VALUE(metrics, '$.ID') = '4486d8dc-9258-45e1-8a41-816bcd6f5ea3';
+	MariaDB [monstore]> SELECT * FROM devices WHERE JSON_VALUE(metrics, '$.ID') = '4486d8dc-9258-45e1-8a41-816bcd6f5ea3';
 	+-----------------------------------------------------+
 	| metrics                                             |
 	+-----------------------------------------------------+
@@ -105,7 +105,7 @@ Show metrics of specific device by ID
 
 Show specific metric of all devices
 ```
-	MariaDB [monitor_metrics]> SELECT JSON_VALUE(metrics, '$.CPU') AS cpu_usage FROM devices;
+	MariaDB [monstore]> SELECT JSON_VALUE(metrics, '$.CPU') AS cpu_usage FROM devices;
 	+-----------+
 	| cpu_usage |
 	+-----------+
@@ -117,7 +117,7 @@ Show specific metric of all devices
 
 Show tabulated metrics of specific device by ID
 ```
-	MariaDB [monitor_metrics]> 
+	MariaDB [monstore]> 
 	SELECT 
 	JSON_VALUE(metrics, '$.ID') AS device_ID 
 	JSON_VALUE(metrics, '$.Time Stamp') AS time_stamp, 
