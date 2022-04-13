@@ -1,8 +1,8 @@
 # PYTHON SCRIPT FOR DASH TO INTERACT WITH DATABASE 
 	# Module Imports
-	import mariadb
+	import MySQLdb
 	import sys
-	
+	import json
 	
 	// receive endpoint from Dash to get quer (e.g. 127.0.0.1/serverstatus)
 	// get data from database
@@ -12,7 +12,7 @@
 	
 	# Connect to MariaDB Platform
 	try:
-		conn = mariadb.connect(
+		conn = MySQLdb.connect(
 			host="cs.csis.work",
 			port=22,
 			user="monstore",
