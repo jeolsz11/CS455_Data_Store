@@ -1,48 +1,69 @@
+#!/usr/local/bin/python
 # PYTHON SCRIPT FOR DASH TO INTERACT WITH DATABASE 
-	# Module Imports
-	import MySQLdb
-	import sys
-	import json
-	
-	// receive endpoint from Dash to get quer (e.g. 127.0.0.1/serverstatus)
-	// get data from database
-	// compile resutls into JSON format text file
-	// send dash text file
-	
-	
-	# Connect to MariaDB Platform
-	try:
-		conn = MySQLdb.connect(
-			host="cs.csis.work",
-			port=22,
-			user="monstore",
-			password="455-mon-store",
-			autocommit=True
-		)
-	except mariadb.Error as e:
-		print(f"Error connecting to MariaDB Platform: {e}")
-		sys.exit(1)
+# Module Imports
+import MySQLdb
+import json
+import socket
+import sys
+  
+# specify Host and Port 
+HOST = 'localhost' 
+PORT = 
 
-	# Instantiate Cursor
-	cursor = conn.cursor()
-	
-	# hard coded JSON for testing in isolation
-	json_data = "{ "ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea3", "Time Stamp": "22:03:29", "CPU": 8, "DISK": 44, "MEMORY": 31, "NETWORK": 8 }"
-	
-	# select data
-	cursor.execute(
-		"SELECT * FROM JSON_TABLE()
-		JSON_VALUE(metrics, '$.ID') AS device_ID 
-		JSON_VALUE(metrics, '$.Time Stamp') AS time_stamp, 
-		JSON_VALUE(metrics, '$.CPU') AS cpu_usage,
-		JSON_VALUE(metrics, '$.DISK') AS disk_usage,
-		JSON_VALUE(metrics, '$.MEMORY') AS memory_usage,
-		JSON_VALUE(metrics, '$.NETWORK') AS network_usage 
-		FROM devices WHERE JSON_VALUE(metrics, '$.ID') = '4486d8dc-9258-45e1-8a41-816bcd6f5ea3'"
-	)
-	# Print Result-set
-	for (first_name, last_name) in cur:
-    print(f"First Name: {first_name}, Last Name: {last_name}")
-	
-	# close connection
-	conn.close()
+soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# binding host and port
+try:
+    soc.bind((HOST, PORT))    
+except socket.error as message:
+    print('Bind failed.')
+    sys.exit()  
+print('Socket binded')
+   
+# starts listening
+soc.listen(9)
+   
+conn, address = soc.accept()
+# print the address of connection
+print('Connected with ' + address[0] + ':' + str(address[1]))
+
+# Connect to MariaDB Platform
+try: 
+connect = MySQLdb.connect(
+	host="localhost",
+	user="monstore",
+	password="455-mon-store",
+	database="monstore",
+	autocommit=True)
+except MySQLdb.Error as e:
+	print(f"Error connecting to database: {e}")
+	sys.exit(1)
+print("Connected to database")
+
+# Instantiate Cursor
+cursor = connect.cursor()
+
+# receive endpoint from Dash to get query (e.g. 127.0.0.1/serverstatus)
+endpoint = 
+
+# get data from database; currently there is only one query type
+query = "SELECT * FROM devices"
+cursor.execute(query)
+
+# compile resutls into JSON format text file
+
+# Data to be written
+result ={"ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea3", "Time Stamp": "22:03:29", "CPU": 8, "DISK": 44, "MEMORY": 31, "NETWORK": 8}
+
+# Serializing json 
+json_object = json.dumps(dictionary, indent = 4)
+
+# Writing to sample.json
+with open("sample.json", "w") as outfile:
+    outfile.write(json_object)
+
+# send dash text file
+
+
+# close connection
+connect.close()
