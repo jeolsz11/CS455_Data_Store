@@ -21,7 +21,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as soc:
             json_data = conn.recv(1024)
             if not json_data:
                 break
-            conn.sendall(json_data) 
+            conn.sendall(json_data)
+            #conn.sendall.encode("UTF-8") 
 
 # Connect to MariaDB Platform
 """
@@ -113,6 +114,9 @@ for i in cursor:
 db.commit()
 """
 
+# close sockets
+conn.close()
+soc.close()
 # close connection
 db.close()
 
