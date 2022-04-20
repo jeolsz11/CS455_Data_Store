@@ -1,14 +1,29 @@
 #!/usr/local/bin/python
 
 # PYTHON SCRIPT TO AUTOMIZE DATABASE
-	# Module Imports
-#import mariadb
-#import mysqlclient
+
+# Module Imports
 import MySQLdb
 #import sys
 import json
-	
-	# Connect to MariaDB Platform
+import socket
+
+HOST = "localhost"
+PORT = # port to listen on 
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as soc:
+    soc.bind((HOST, PORT))
+    soc.listen()
+    conn, addr = soc.accept()
+    with conn:
+        print(f"Connected by {addr}")
+        while True:
+            json_data = conn.recv(1024)
+            if not json_data:
+                break
+            conn.sendall(json_data) 
+
+# Connect to MariaDB Platform
 #try:
 #	conn = MySQLdb.connect(
 #	host="cs.csis.work",
@@ -26,10 +41,9 @@ try:
     db = MySQLdb.connect("localhost","monstore","455-mon-store","monstore")
 except:
     print("Can't connect to database")
-    #return 0
-
-#successful connection
-print("Connected") 
+else:
+    #successful connection
+    print("Connected to database") 
 
 # Instantiate Cursor
 cursor = db.cursor()
@@ -54,17 +68,18 @@ for i in cursor:
 
 
 # try to insert new values into the devices table
-#json_data1 = { "ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea3", "Time Stamp": "22:03:29", "CPU": 8, "DISK": 44, "MEMORY": 31, "NETWORK": 8 }
-json_data2 = { "ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea1", "Time Stamp": "22:01:29", "CPU": 1, "DISK": 40, "MEMORY": 30, "NETWORK": 1 }
+json_data1 = { "ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea3", "Time Stamp": "22:03:29", "CPU": 8, "DISK": 44, "MEMORY": 31, "NETWORK": 8 }
+json_data2 = { "ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea1", "Time Stamp": "22:01:29", "CPU": 1, "DISK": 40, "MEMORY": 30, "NETWORK": 2 }
 query = 'INSERT INTO devices() VALUES(%s)'
 
 try:
-	cursor.execute(query, (json.dumps(json_data2),))
+	cursor.execute(query, (json.dumps(json_data),))
 except:
-    print("Failed to insert values") 
-db.commit()
-# print that 1 row was inserted if successful 
-print(cursor.rowcount, "record inserted.") 
+    print("Failed to insert values")
+else:
+    db.commit()
+    # print that 1 row was inserted if successful  
+    print(cursor.rowcount, "record inserted.") 
 
 # print table with the new row that was inserted 
 cursor.execute('SELECT * FROM devices')
