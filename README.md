@@ -1,10 +1,6 @@
 # 455_Data_Store
-Datastore component of the CS 455 Monitor Project.
 
-Agents, Engine, and Data Store are daemons (a computer program that runs as a background process, rather than being under the direct control of an interactive user).
-
-Only Dash has user interface
-
+**`5/3 Deliver software, documentation, and do team presentations(3:30 - 5:30)`**
 
 TO DO LIST
 - Communication testing with Engine
@@ -18,3 +14,4 @@ TO DO LIST
     ```
     { "ID": "00ce9834-8453-4580-8082-4d2748c84e65", "Time Stamp": 1650469613, "CPU": 10, "DISK": 3, "MEMORY": 66, "NETWORK": { "BYTES SENT": 1554241536, "BYTES RECIEVED": 3376441344 } }
     ```
+- update minutes.tex and add minutes PDF before turning in deliverables
