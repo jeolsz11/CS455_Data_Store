@@ -1,69 +1,81 @@
 #!/usr/local/bin/python
-# PYTHON SCRIPT FOR DASH TO INTERACT WITH DATABASE 
+# Python script to automatize interactions between Dashboard and Data Store
+# This program uses the TCP server/client model where:
+# Data Store acts as the server due to being hosted on the CS server
+# Dash acts as the client due to being external to the CS server
+
 # Module Imports
+import sys
 import MySQLdb
 import json
 import socket
-import sys
-  
+
 # specify Host and Port 
 HOST = 'localhost' 
-PORT = 
+PORT = 8080
 
-soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # binding host and port
 try:
-    soc.bind((HOST, PORT))    
+    s.bind((HOST, PORT))    
 except socket.error as message:
-    print('Bind failed.')
-    sys.exit()  
-print('Socket binded')
+    print('>> Bind failed.')
+    sys.exit() 
+else: 
+    print('>> Socket binded')
    
 # starts listening
-soc.listen(9)
+s.listen()
+print ('>> Listening...')
    
-conn, address = soc.accept()
-# print the address of connection
-print('Connected with ' + address[0] + ':' + str(address[1]))
+# receive from Dash   
+#while True:
+connect, addr = s.accept() # establish connection with Dash
+print ('>> Connected')
+query = connect.recv(1024).decode('utf-8')
+print ('>> Received ', repr(query))
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Connect to MariaDB Platform
-try: 
-connect = MySQLdb.connect(
-	host="localhost",
-	user="monstore",
-	password="455-mon-store",
-	database="monstore",
-	autocommit=True)
-except MySQLdb.Error as e:
-	print(f"Error connecting to database: {e}")
-	sys.exit(1)
-print("Connected to database")
+#try: 
+#   connect = MySQLdb.connect(
+#	host="localhost",
+#	user="monstore",
+#	password="455-mon-store",
+#	database="monstore",
+#	autocommit=True)
+#except MySQLdb.Error as e:
+#	print(f"Error connecting to database: {e}")
+#	sys.exit(1)
+#else:
+#	print("Connected to database")
 
 # Instantiate Cursor
-cursor = connect.cursor()
-
-# receive endpoint from Dash to get query (e.g. 127.0.0.1/serverstatus)
-endpoint = 
+#cursor = connect.cursor()
 
 # get data from database; currently there is only one query type
-query = "SELECT * FROM devices"
-cursor.execute(query)
+#query = "SELECT * FROM devices"
+#cursor.execute(query)
 
-# compile resutls into JSON format text file
+# write results to metrics.json; writing over what was previously there
+#json_object = json.dumps(dictionary, indent = 4)
+#with open("metrics.json", "w") as outfile:
+#outfile.write(json_object)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Data to be written
-result ={"ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea3", "Time Stamp": "22:03:29", "CPU": 8, "DISK": 44, "MEMORY": 31, "NETWORK": 8}
+filename = 'metrics.json' # file MUST be in same folder or path as program
+file = open(filename,'rb')
+l = file.read(1024)
 
-# Serializing json 
-json_object = json.dumps(dictionary, indent = 4)
+#while (l):
+connect.sendall('Data Store'.encode('utf-8'))
+print('>> Sent ', repr(l))
+l = file.read(1024)
+file.close()
 
-# Writing to sample.json
-with open("sample.json", "w") as outfile:
-    outfile.write(json_object)
+print('>> Done sending')
 
-# send dash text file
-
-
-# close connection
+# close socket and connection		
+s.close()
 connect.close()
