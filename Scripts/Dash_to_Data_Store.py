@@ -12,7 +12,7 @@ import socket
 
 # specify Host and Port 
 HOST = 'localhost' 
-PORT = 8080
+PORT = 8082
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
