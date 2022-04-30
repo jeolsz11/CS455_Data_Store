@@ -7,15 +7,51 @@
 # using websockets to communicate with dash due to dash being browser based
 
 # Module Imports
+import sys
+import MySQLdb
+import json
 import asyncio
 import websockets
 
-async def echo(websocket):
-    async for message in websocket:
-        await websocket.send(message)
+# function to retrive endpoint, then send query result
+async def db(websocket):
+    endpoint = await websocket.recv()
+    print(f">> Received: {endpoint}")
+ 
+    # Connect to MariaDB Platform
+    try: 
+       connect = MySQLdb.connect(
+	    host="localhost",
+	    user="monstore",
+	    password="455-mon-store",
+	    database="monstore",
+	    autocommit=True)
+    except MySQLdb.Error as e:
+	    print(f">> Error connecting to database: {e}")
+	    sys.exit(1)
+    else:
+	    print(">> Connected to database")
 
+    # Instantiate Cursor
+    cursor = connect.cursor()
+
+    # get data from database; currently there is only one query type
+    query = "SELECT * FROM devices"
+    cursor.execute(query)
+    rows =  cursor.fetchall()
+    result = ''
+    for row in rows:
+        result = result + str(row) 
+
+    #result = f">> Data Store"
+
+    await websocket.send(result)
+    print(f">> Sent: {result}")
+
+# asyncio event loop
 async def main():
-    async with websockets.serve(echo, 'cs.csis.work', 8082):
+    async with websockets.serve(db, 'cs.csis.work', 8082):
         await asyncio.Future()  # run forever
 
+# run acutal program
 asyncio.run(main())
