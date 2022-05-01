@@ -15,6 +15,7 @@ import websockets
 
 # function to retrive endpoint, then send query result
 async def get_metrics(websocket):
+    count = 0
     endpoint = await websocket.recv()
     print(f">> Received: {endpoint}")
  
@@ -39,17 +40,16 @@ async def get_metrics(websocket):
     query = "SELECT * FROM devices"
     cursor.execute(query)
     select = cursor.fetchall()
-    result = "["
     
+    result = "["
     for row in select:
         result += "".join(row)
         result += ","
-
     result += "".join("]")
     result = result.replace("}},]", "}}]")
-
+	
     await websocket.send(result)
-    print(f">> Sent: {result}\n")
+    print(f">> Sent: result\n")
 
 
 # asyncio event loop
