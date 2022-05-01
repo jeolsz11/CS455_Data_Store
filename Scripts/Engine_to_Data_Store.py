@@ -19,7 +19,7 @@ def insert_into_database(db, json_data):
     # SQL query to insert into the error_log table in the database.
     query4 = 'INSERT INTO error_log(error) VALUES(%s)'
     
-    """
+    
     # If an error message is sent, insert it into the error_log table in the database.
     if(json_data[0] != "{"):
         try:
@@ -38,8 +38,7 @@ def insert_into_database(db, json_data):
                     print()
                 else:
                     print("Error printing data")
-        break
-    """
+                    return
 
     # Testing SELECT so show everything that is currently in the devices table.
     cursor.execute('SELECT * FROM devices')
