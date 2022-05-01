@@ -14,7 +14,7 @@ import asyncio
 import websockets
 
 # function to retrive endpoint, then send query result
-async def db(websocket):
+async def get_metrics(websocket):
     endpoint = await websocket.recv()
     print(f">> Received: {endpoint}")
  
@@ -41,17 +41,19 @@ async def db(websocket):
     rows =  cursor.fetchall()
     result = ''
     for row in rows:
-        result = result + str(row) 
+        result = result + str(row)
 
     #result = f">> Data Store"
 
     await websocket.send(result)
     print(f">> Sent: {result}")
 
+
 # asyncio event loop
 async def main():
-    async with websockets.serve(db, 'cs.csis.work', 8082):
-        await asyncio.Future()  # run forever
+    async with websockets.serve(get_metrics, 'cs.csis.work', 8082):
+        await asyncio.Future() # run forever
+
 
 # run acutal program
 asyncio.run(main())
