@@ -1,65 +1,147 @@
 #!/usr/local/bin/python
 
-# PYTHON SCRIPT TO AUTOMIZE DATABASE
+# PYTHON SCRIPT TO AUTOMIZE DATABASE.
+# This script automizes interactions between the Engine and the Data Store.
+# This program receives JSON data from the Engine and then inserts the data into the Data Store which is a MariaDB database.
+# The Data Store acts as a server due to being hosted on the CS server.
 
-# Module Imports
+# Module Imports.
 import MySQLdb
 import sys
 import json
 import socket
 
+# Function to insert data into the database.
 def insert_into_database(db, json_data):
-    # Instantiate Cursor
+    # Instantiate Cursor.
     cursor = db.cursor()
 
-    # Testing SELECT so show everything in the devices table
+    # SQL query to insert into the error_log table in the database.
+    query4 = 'INSERT INTO error_log(error) VALUES(%s)'
+    
+    """
+    # If an error message is sent, insert it into the error_log table in the database.
+    if(json_data[0] != "{"):
+        try:
+            cursor.execute(query4, (json.dumps(json_data),))
+        except:
+            print("Failed to insert error message")
+        else:
+            db.commit()
+            print(cursor.rowcount, "record inserted into error_log table.")
+            print()
+            cursor.execute('SELECT * FROM error_log')
+            for i in cursor:
+                data = cursor.fetchone()
+                if data:
+                    print(data)
+                    print()
+                else:
+                    print("Error printing data")
+        break
+    """
+
+    # Testing SELECT so show everything that is currently in the devices table.
     cursor.execute('SELECT * FROM devices')
     for i in cursor:
         data = cursor.fetchone()
         if data:
-            #print(i)
-            #print()
             print(data)
             print()
         else:
-            print("Error") 
+            print("Error printing data") 
+   
+    # Adding double quotes where they need to be so that the received data is in proper JSON format.
+    char1 = "ID: "
+    json_data = json_data.replace(char1, "\"ID\": \"")
 
+    char1 = ", Time Stamp: "
+    json_data = json_data.replace(char1, "\", \"Time Stamp\": ")
+
+    char1 = "CPU: "
+    json_data = json_data.replace(char1, "\"CPU\": ")
+
+    char1 = "DISK: "
+    json_data = json_data.replace(char1, "\"DISK\": ")
+
+    char1 = "MEMORY: "
+    json_data = json_data.replace(char1, "\"MEMORY\": ")
+
+    char1 = "NETWORK: "
+    json_data = json_data.replace(char1, "\"NETWORK\": ")
+
+    char1 = "BYTES SENT: "
+    json_data = json_data.replace(char1, "\"BYTES SENT\": ")
+
+    char1 = "BYTES RECEIVED: "
+    json_data = json_data.replace(char1, "\"BYTES RECEIVED\": ")
+
+    #print(json_data)
+    #print() 
+
+    # Convert from a string to JSON.
+    json1 = json.loads(json_data)
+    
+    # Get the ID number of the received data to check if this particular device is already in the database.
+    json_id = json1["ID"]
+    json_id1 = (str(json_id), )
+    
+    # SQL queries to insert into and delete from the devices table in the database.
     query = 'INSERT INTO devices() VALUES(%s)'
+    #query2 = 'SELECT JSON_VALUE(metrics, "$.ID") AS id FROM devices' 
+    query3 = 'DELETE FROM devices WHERE JSON_VALUE(metrics, "$.ID") = %s'
+
+    # Try and see if the particular device ID that was received from the Engine is already in the database.
+    # If it is already in the database, delete it from the database. 
+    # The new data that was received will be inserted into the database instead.
     try:
-	    cursor.execute(query, (json.dumps(json_data),))
+        cursor.execute(query3, json_id1)
+    except:
+        print("No duplicates were deleted")
+    else:
+        db.commit()
+        # Print how many rows were deleted.
+        print(cursor.rowcount, "record(s) deleted from devices table.")
+
+    # Try to insert data into the database.
+    try:
+	    cursor.execute(query, (json.dumps(json1),))
     except:
         print("Failed to insert values")
     else:
         db.commit()
-        # Print that 1 row was inserted if successful  
-        print(cursor.rowcount, "record inserted.") 
+        # Print that 1 row was inserted if successful.  
+        print(cursor.rowcount, "record inserted into devices table.") 
         print()
 
-    # Print table with the new row that was inserted 
+    # Print the devices table with the new row that was inserted. 
     cursor.execute('SELECT * FROM devices')
     for i in cursor:
         data = cursor.fetchone()
         if data:
-            #print(i)
-            #print()
             print(data)
             print()
         else:
-            print("Error")
+            print("Error printing data")
 
 
+# Host and Port to listen on.
 HOST = "localhost"
 PORT = 8081
 
+# Using sockets to listen for incoming messages from the Engine.
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as soc:
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # Try to bind the socket.
     try:
         soc.bind((HOST, PORT))
     except:
         print("Bind failed.")
         sys.exit()
     else:
+        # Successful binding.
         print("Socket Binded.") 
+        # Listen for the Engine.
         soc.listen()
         print("Listening...")
         conn, addr = soc.accept()
@@ -68,87 +150,22 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as soc:
             print(f"Connected by {addr}")
             while True:
                 json_data = conn.recv(1024).decode()
+                # Print what was received from the Engine.
                 print("Received: ", json_data) 
                 if not json_data:
                     break                
+                # Try to connect to the database.
                 try:
                     db = MySQLdb.connect("localhost","monstore","455-mon-store","monstore")
                 except:
                     print("Can't connect to database")
                 else:
-                    #successful connection
+                    # Successful connection.
                     print("Connected to database")
                     print()
+                    # Insert data into the database.
                     insert_into_database(db, json_data)
 		            # Close connection
                     db.close()
-                #conn.sendall(json_data)
-                #conn.sendall.encode("UTF-8") 
 
-
-# Try to connect to the database
-"""
-try:
-    db = MySQLdb.connect("localhost","monstore","455-mon-store","monstore")
-except:
-    print("Can't connect to database")
-else:
-    #successful connection
-    print("Connected to database")
-    print()
-"""
-"""
-# Instantiate Cursor
-cursor = db.cursor()
-	
-# Hard coded JSON for testing in isolation
-#json_data = '{ "ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea3", "Time Stamp": "22:03:29", "CPU": 8, "DISK": 44, "MEMORY": 31, "NETWORK": 8 }'
-
-# Testing SELECT so show everything in the devices table
-cursor.execute('SELECT * FROM devices')
-for i in cursor:
-    data = cursor.fetchone()
-    if data:
-        #print(i)
-        #print()
-        print(data)
-        print()
-    else:
-        print("Error") 
-
-# Add data
-# Try to insert new values into the devices table
-json_data1 = { "ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea3", "Time Stamp": "22:03:29", "CPU": 8, "DISK": 44, "MEMORY": 31, "NETWORK": 8 }
-json_data2 = { "ID": "4486d8dc-9258-45e1-8a41-816bcd6f5ea1", "Time Stamp": "22:01:29", "CPU": 1, "DISK": 40, "MEMORY": 30, "NETWORK": 2 }
-json_data3 = { "ID": "00ce9834-8453-4580-8082-4d2748c84e65", "Time Stamp": 1650469613, "CPU": 10, "DISK": 3, "MEMORY": 66, "NETWORK": { "BYTES SENT": 1554241536, "BYTES RECIEVED": 3376441344 } }
-query = 'INSERT INTO devices() VALUES(%s)'
-
-try:
-	cursor.execute(query, (json.dumps(json_data),))
-except:
-    print("Failed to insert values")
-else:
-    db.commit()
-    # Print that 1 row was inserted if successful  
-    print(cursor.rowcount, "record inserted.") 
-    print()
-
-# Print table with the new row that was inserted 
-cursor.execute('SELECT * FROM devices')
-for i in cursor:
-    data = cursor.fetchone()
-    if data:
-        #print(i)
-        #print()
-        print(data)
-        print()
-    else:
-        print("Error") 
-"""
-
-# Close sockets
-#conn.close()
-#soc.close()
-# Close connection
-#db.close()
 
