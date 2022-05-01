@@ -38,15 +38,18 @@ async def get_metrics(websocket):
     # get data from database; currently there is only one query type
     query = "SELECT * FROM devices"
     cursor.execute(query)
-    rows =  cursor.fetchall()
-    result = ''
-    for row in rows:
-        result = result + str(row)
+    select = cursor.fetchall()
+    result = "["
+    
+    for row in select:
+        result += "".join(row)
+        result += ","
 
-    #result = f">> Data Store"
+    result += "".join("]")
+    result = result.replace("}},]", "}}]")
 
     await websocket.send(result)
-    print(f">> Sent: {result}")
+    print(f">> Sent: {result}\n")
 
 
 # asyncio event loop
