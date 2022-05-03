@@ -36,6 +36,7 @@ def insert_into_database(db, json_data):
                 if data:
                     print(data)
                     print()
+		    return	
                 else:
                     print("Error printing data")
                     return
