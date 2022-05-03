@@ -164,7 +164,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as soc:
                     print()
                     # Insert data into the database.
                     insert_into_database(db, json_data)
-		            # Close connection
+		    # Close connection
                     db.close()
 
 
